@@ -27,13 +27,13 @@ changing data to the right datatype
 
 #customers
 
-customers_landing = spark.read.format("delta").load("../data/raw-DFs/customers")
-customers_landing = customers_landing.dropDuplicates()
+customers_bronze = spark.read.format("delta").load("../data/raw-DFs/customers")
+customers_bronze = customers_bronze.dropDuplicates()
 
 def latest_duplicate_customer_id(df: DataFrame):
-    customers_landing_1 = df.dropna(subset=["customer_id"])
-    df_dup_customer_id = customers_landing_1.groupBy(col("customer_id")).count().filter(col("count") >= 2)
-    df_dup_customer_id = customers_landing.join(df_dup_customer_id, "customer_id", "inner")
+    customers_bronze_1 = df.dropna(subset=["customer_id"])
+    df_dup_customer_id = customers_bronze_1.groupBy(col("customer_id")).count().filter(col("count") >= 2)
+    df_dup_customer_id = customers_bronze.join(df_dup_customer_id, "customer_id", "inner")
     # Avoid: df1.join(df2, df1.id == df2.id) -> Creates duplicate 'id' columns
     # Do this instead:
     #joined_df = df1.join(df2, "id", "inner")
@@ -45,15 +45,15 @@ def latest_duplicate_customer_id(df: DataFrame):
 
 
 
-customers_latest_duplicates = latest_duplicate_customer_id(customers_landing)
+customers_latest_duplicates = latest_duplicate_customer_id(customers_bronze)
 
 
 """
 This is bringing non-key, unwanted columns from latest_duplicate_custer_id DF. 
 
-customers_unique = customers_landing.join(customers_latest_duplicates, ["customer_id", "created_timestamp"], "left")
+customers_unique = customers_bronze.join(customers_latest_duplicates, ["customer_id", "created_timestamp"], "left")
 """
-customers_unique= customers_landing.join(customers_latest_duplicates.select(col("customer_id"), col("created_timestamp")), ["customer_id", "created_timestamp"], "left")
+customers_unique= customers_bronze.join(customers_latest_duplicates.select(col("customer_id"), col("created_timestamp")), ["customer_id", "created_timestamp"], "left")
 
 
 #casting columns
