@@ -15,7 +15,6 @@ builder = (
         "org.apache.spark.sql.delta.catalog.DeltaCatalog",
     )
     .config("spark.master", "local[*]")
-
 )
 
 

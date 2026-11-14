@@ -53,7 +53,7 @@ This is bringing non-key, unwanted columns from latest_duplicate_custer_id DF.
 
 customers_unique = customers_bronze.join(customers_latest_duplicates, ["customer_id", "created_timestamp"], "left")
 """
-customers_unique= customers_bronze.join(customers_latest_duplicates.select(col("customer_id"), col("created_timestamp")), ["customer_id", "created_timestamp"], "left")
+customers_unique = customers_bronze.join(customers_latest_duplicates.select(col("customer_id"), col("created_timestamp")), ["customer_id", "created_timestamp"], "left")
 
 
 #casting columns
